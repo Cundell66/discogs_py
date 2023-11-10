@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Full Collection
+{% endblock %}
+{% block main %}
+    <form id="form" class="form">
+        <table class="table table-bordered border-primary">
+            <thead>
+                <th> Image </th>
+            </thead>
+            {% for album in albums %}
+                <tr border-bottom: 3px solid #000>
+                    <td  rowspan = "7"> <img class="small_image" src={{ album.cover_image }} /> </td>
+                <tr>
+                    <th> Title </th>
+                    <th> Artist </th>
+                </tr>
+                <tr class="first_row">
+                    <td>{{ album.title }}</td>
+                    <td>{{ album.artist }}</td>
+                </tr>
+                <tr>
+                    <th> Year </th>
+                    <th> Description </th>
+                </tr>
+                <tr>
+                    <td>{{ album.year }}</td>
+                    <td>{{ album.description }}</td>
+                </tr>
+                <tr>
+                    <th> Genre </th>
+                    <th> Label </th>
+                </tr>
+                <tr>
+                    <td>{{ album.genres }}</td>
+                    <td>{{ album.label }}</td>
+                </tr>
+                <tr border-bottom: 10px solid #000>
+                    
+                </tr>
+            </tr>
+
+            {% endfor %}
+        </table>
+    </form>
+{% endblock %}
