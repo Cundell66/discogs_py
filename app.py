@@ -1,6 +1,6 @@
 import os
-import time
-from flask import Flask, render_template, request
+# import time
+from flask import Flask, render_template
 from cs50 import SQL
 import requests
 import random
