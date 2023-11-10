@@ -37,6 +37,7 @@ def fetchContents(itemNo, page):
     contents = releases[itemNo]["basic_information"]
     idNumber = contents["master_id"]
     master = requests.get(masterURL + str(idNumber)).json()
+    contents["year"] = master["year"]
     tracklist = master["tracklist"]
     return contents, tracklist, totalItems
 
