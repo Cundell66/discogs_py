@@ -1,6 +1,6 @@
 import os
 # import time
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
 from cs50 import SQL
 import requests
 import random
@@ -142,3 +142,10 @@ def collection():
 @app.route("/database", methods=["GET"])
 def database():
     return render_template("database.html", result="")
+
+@app.route("/delete", methods=["POST"])
+def delete():
+    album_id = request.form.get("id")
+    if album_id:
+        db.execute("DELETE FROM albums WHERE id = ?", album_id )
+    return redirect("/collection")

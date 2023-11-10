@@ -6,11 +6,14 @@
 {% block main %}
     <form id="form" class="form">
         <table class="table table-bordered border-primary">
-            <thead>
-                <th> Image </th>
-            </thead>
             {% for album in albums %}
                 <tr border-bottom: 3px solid #000>
+                    <td rowspan = "7">
+                        <form action="/delete" method="post">
+                            <input name="id" type="hidden" value="{{ album.id }}">
+                            <button type="submit">Delete Album</button>
+                        </form>
+                    </td>
                     <td  rowspan = "7"> <img class="small_image" src={{ album.cover_image }} /> </td>
                 <tr>
                     <th> Title </th>
