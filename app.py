@@ -149,3 +149,18 @@ def delete():
     if album_id:
         db.execute("DELETE FROM albums WHERE id = ?", album_id )
     return redirect("/collection")
+
+@app.route("/lyrics", methods=["POST"])
+def lyrics():
+    bad_chars = [";", ":","-","!", "*", ",","'"]
+    artist = request.form.get("artist")
+    title = request.form.get("title")
+    a=""
+    for i in artist:
+        if i not in bad_chars:
+            a+=i
+    t=""
+    for i in title:
+        if i not in bad_chars:
+            t+=i
+    return redirect(f'https://genius.com/albums/{a.replace(" ","-")}/{t.replace(" ","-")}')
