@@ -7,7 +7,7 @@
     <form id="form" class="form">
         <table class="table table-bordered border-primary">
             <thead>
-                <th> {{contents["artists"][0]["name"]}} </th>
+                <th> {{contents.artists[0].name}} </th>
                 <th> {{contents["title"]}} </th>
             </thead>
             <tr>
@@ -19,17 +19,17 @@
                 </td>
             </tr>
             <tr>
-                <td> {{ contents["year"] }} </td>
+                <td> {{contents.year}} </td>
                 <td>
-                    {% for description in contents["formats"][0]["descriptions"] %}
+                    {% for description in contents.formats[0].descriptions %}
                         {{ description }},
                     {% endfor %}
                 </td>
             </tr>
             <tr>
-                <td>{{ contents["labels"][0]["name"] }} </td>
+                <td>{{contents.labels[0].name}} </td>
                 <td>
-                    {% for genre in contents["genres"] %}
+                    {% for genre in contents.genres %}
                         {{genre}},
                     {% endfor %}
                 </td>

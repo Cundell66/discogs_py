@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+{% block main %}
+
+    <form id="form" class="form">
+        <table class="table table-bordered border-primary">
+            <th colspan="2"> {{ artist }} - {{ title }} </th>
+            <tr>
+                <td>
+                    <img class="small_image" src={{ cover }} />
+                </td>
+                <td class="tracks">
+                    {% for track in tracks %}
+                        <p> {{ track["position"]}} {{track["title"]}} {{track["duration"]}} </p>
+                    {% endfor %}
+                </td>
+            </tr>
+
+        </table>
+    </form>
+{% endblock %}

@@ -29,11 +29,17 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbar">
+                    <form action="/search" method="post">
+                        <input autocomplete="off" autofocus placeholder="Artist Search" type="text" name="q">
+                        <button type="submit">Search</button>
+                    </form>
+    
                     <ul class="navbar-nav ms-auto mt-2">
                         <li class="nav-item"><a class="nav-link" href="/">Random Pick</a></li>
                         <li class="nav-item"><a class="nav-link" href="/collection">Full Collection</a></li>
                         <li class="nav-item"><a class="nav-link" href="/update">Update Database</a></li>
                         <li class="nav-item"><a class="nav-link" href="/rebuild">Rebuild Database</a></li>
+
                     </ul>
                 </div>
             </div>

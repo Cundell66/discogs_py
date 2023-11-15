@@ -1,4 +1,5 @@
 import os
+
 # import time
 from flask import Flask, render_template, request, redirect
 from cs50 import SQL
@@ -6,12 +7,11 @@ import requests
 import random
 import math
 
-
 app = Flask(__name__)
 
 db = SQL("sqlite:///vinyl_records.db")
 
-# import secrets from discogs.js which is not on github
+# import secrets from .env which is not on github
 app.config.from_pyfile("settings.py")
 
 userName = os.getenv("userName")
@@ -36,8 +36,7 @@ def fetchContents(itemNo, page):
     totalItems = discogs["pagination"]["items"]
     contents = releases[itemNo]["basic_information"]
     idNumber = contents["master_id"]
-    master = requests.get(masterURL + str(idNumber)).json()
-    contents["year"] = master["year"]
+    master = requests.get(masterURL + str(idNumber) + "?token=" + discogsToken).json()
     tracklist = master["tracklist"]
     return contents, tracklist, totalItems
 
@@ -91,8 +90,9 @@ def update():
             )
             if not existing_album:
                 db.execute(
-                    "INSERT INTO albums (artist, title, year, description, cover_image, genres, label, release_id, master_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT INTO albums (artist, artist_id, title, year, description, cover_image, genres, label, release_id, master_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     contents["artists"][0]["name"],
+                    contents["artists"][0]["id"],
                     contents["title"],
                     contents["year"],
                     ",".join(contents["formats"][0]["descriptions"]),
@@ -102,7 +102,7 @@ def update():
                     contents["id"],
                     contents["master_id"],
                 )
-        return render_template("database.html", result="Database updated successfully")
+        return redirect("/collection")
     except Exception as e:
         return str(e)
 
@@ -117,18 +117,19 @@ def rebuild():
         for i in range(len(allcontents)):
             contents = allcontents[i]
             db.execute(
-                    "INSERT INTO albums (artist, title, year, description, cover_image, genres, label, release_id, master_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    contents["artists"][0]["name"],
-                    contents["title"],
-                    contents["year"],
-                    ",".join(contents["formats"][0]["descriptions"]),
-                    contents["cover_image"],
-                    contents["genres"][0],
-                    contents["labels"][0]["name"],
-                    contents["id"],
-                    contents["master_id"],
+                "INSERT INTO albums (artist, artist_id, title, year, description, cover_image, genres, label, release_id, master_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                contents["artists"][0]["name"],
+                contents["artists"][0]["id"],
+                contents["title"],
+                contents["year"],
+                ",".join(contents["formats"][0]["descriptions"]),
+                contents["cover_image"],
+                contents["genres"][0],
+                contents["labels"][0]["name"],
+                contents["id"],
+                contents["master_id"],
             )
-        return render_template("database.html", result="Database updated successfully")
+        return redirect("/collection")
     except Exception as e:
         return str(e)
 
@@ -143,24 +144,70 @@ def collection():
 def database():
     return render_template("database.html", result="")
 
+
 @app.route("/delete", methods=["POST"])
 def delete():
     album_id = request.form.get("id")
     if album_id:
-        db.execute("DELETE FROM albums WHERE id = ?", album_id )
+        db.execute("DELETE FROM albums WHERE id = ?", album_id)
     return redirect("/collection")
+
 
 @app.route("/lyrics", methods=["POST"])
 def lyrics():
-    bad_chars = [";", ":","-","!", "*", ",","'"]
+    bad_chars = [";", ":", "-", "!", "*", ",", "'"]
     artist = request.form.get("artist")
     title = request.form.get("title")
-    a=""
+    print(artist, title)
+    a = ""
     for i in artist:
         if i not in bad_chars:
-            a+=i
-    t=""
+            a += i
+    t = ""
     for i in title:
         if i not in bad_chars:
-            t+=i
-    return redirect(f'https://genius.com/albums/{a.replace(" ","-")}/{t.replace(" ","-")}')
+            t += i
+    return redirect(
+        f"https://genius.com/albums/{a.replace(' ',' - ')}/{t.replace(' ',' - ')}"
+    )
+
+
+@app.route("/artist", methods=["POST"])
+def artist():
+    artist = request.form.get("artist")
+    discogsURL = f"https://api.discogs.com/database/search?format=lp&artist={artist}&country=uk&token={discogsToken}"
+    releases = requests.get(discogsURL).json()
+    releases["results"].sort(
+        key=lambda x: int(x["year"])
+        if "year" in x and x["year"].isdigit()
+        else float("inf")
+    )
+    # Filter the releases to return each title only once
+    titles = set()
+    unique_releases = []
+    for release in releases["results"]:
+        if release["title"] not in titles:
+            titles.add(release["title"])
+            unique_releases.append(release)
+
+    return render_template("artist.html", releases=unique_releases, artist=artist)
+
+
+@app.route("/tracks", methods=["POST"])
+def tracks():
+    artist = request.form.get("artist")
+    cover = request.form.get("cover")
+    title = request.form.get("title")
+    idNumber = request.form.get("master_id")
+    master = requests.get(masterURL + str(idNumber) + "?token=" + discogsToken).json()
+    tracklist = master["tracklist"]
+    return render_template("tracks.html", tracks=tracklist, title=title, cover=cover, artist=artist)
+
+@app.route("/search", methods=["POST"])
+def search():
+    q = request.form.get("q")
+    if q:
+        albums = db.execute("SELECT * FROM albums WHERE artist LIKE ? ORDER BY year", "%" + q + "%")
+    else:
+        albums = []
+    return render_template("search.html", albums=albums, q=q)
