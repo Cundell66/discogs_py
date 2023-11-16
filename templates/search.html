@@ -10,27 +10,15 @@
             <th colspan = "4">Search for {{q}}</th>
             {% for album in albums %}
                 <tr border-bottom: 3px solid #000>
-                    <td rowspan = "7">
-                        <div>
-                            <form action="/lyrics" method="post">
-                                <input name="artist" type="hidden" value="{{ album.artist }}">
-                                <input name="title" type="hidden" value="{{ album.title }}">
-                                <button class="artist_button" type="submit">Lyrics</button>
-                            </form>
-                        </div>
+                    <td rowspan = "6">
                         <div>
                             <form action="https://www.wikipedia.com/wiki/{{album.artist}}_discography">
                                 <input class="artist_button" type="submit" value="Wiki Discography">
                             </form>
                         </div>
-                        <div>
-                            <form class="delete" action="/delete" method="post">
-                                <input name="id" type="hidden" value="{{ album.id }}">
-                                <button class="artist_button" type="submit">Delete Album</button>
-                            </form>
-                        </div>
-                        </td>
+                    </td>
                     <td  rowspan = "7"> <img class="small_image" src={{ album.cover_image }} /> </td>
+                </tr>
                 <tr>
                     <th> Title </th>
                     <th> Artist </th>
@@ -66,6 +54,12 @@
                     <th> Label </th>
                 </tr>
                 <tr>
+                    <td>
+                        <form action="/delete" method="post">
+                            <input name="id" type="hidden" value="{{ album.id }}">
+                            <button class="delete_button" type="submit">Delete Album</button>
+                        </form>
+                    </td>
                     <td>{{ album.genres }}</td>
                     <td>{{ album.label }}</td>
                 </tr>

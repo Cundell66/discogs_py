@@ -4,7 +4,7 @@
     Now Playing
 {% endblock %}
 {% block main %}
-    <form id="form" class="form">
+    <form id="form" class="form" action="/tracks" method="post">
         <table class="table table-bordered border-primary">
             <thead>
                 <th> {{contents.artists[0].name}} </th>
@@ -14,7 +14,13 @@
                 <td> <img class="image" src={{ contents["cover_image"] }} /> </td>
                 <td class="tracks">
                     {% for tracks in tracklist %}
-                        <p> {{ tracks["position"]}} {{tracks["title"]}} {{tracks["duration"]}} </p>
+                        <div>
+                            <input name="artist" type="hidden" value="{{ contents.artists[0].name }}">
+                            <input name="title" type="hidden" value="{{ contents["title"] }}">
+                            <input name="cover" type="hidden" value="{{ contents["cover_image"] }}">
+                            <input name="master_id" type="hidden" value="{{ contents["master_id"] }}">
+                            <button class="artist_button" type="submit">{{ tracks["position"]}} {{tracks["title"]}} {{tracks["duration"]}}</button>
+                        </div>
                     {% endfor %}
                 </td>
             </tr>

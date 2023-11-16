@@ -1,6 +1,5 @@
 import os
 
-# import time
 from flask import Flask, render_template, request, redirect
 from cs50 import SQL
 import requests
@@ -17,6 +16,7 @@ app.config.from_pyfile("settings.py")
 userName = os.getenv("userName")
 discogsToken = os.getenv("discogsToken")
 folderID = os.getenv("folderID")
+geniusToken = os.getenv("genius_token")
 totalItems = 355
 
 # set urls for required routes
@@ -167,10 +167,25 @@ def lyrics():
     for i in title:
         if i not in bad_chars:
             t += i
-    return redirect(
-        f"https://genius.com/albums/{a.replace(' ',' - ')}/{t.replace(' ',' - ')}"
-    )
+    search_url = f"https://api.genius.com/search?q={a.replace(' ','-')}-{t.replace(' ','-')}"
+    print(search_url)
+    headers = {
+        "Authorization": f"Bearer {geniusToken}"
+    }
+    print(headers)
+    response = requests.get(search_url, headers=headers)
+    print(response)
+    data = response.json()
 
+    api_path = data['response']['hits'][0]['result']['api_path']
+
+    song_url = f"https://api.genius.com{api_path}"
+    song_response = requests.get(song_url, headers=headers)
+    song_data = song_response.json()
+
+    embed_content = song_data['response']['song']['embed_content']
+
+    return render_template("lyrics.html", content=embed_content, artist=artist, title=title)
 
 @app.route("/artist", methods=["POST"])
 def artist():
@@ -211,3 +226,9 @@ def search():
     else:
         albums = []
     return render_template("search.html", albums=albums, q=q)
+
+@app.route("/wiki", methods=["POST"])
+def wiki():
+    artist = request.form.get("artist")
+    url = f"https://www.wikipedia.com/wiki/{artist}_discography"
+    return redirect(url)
