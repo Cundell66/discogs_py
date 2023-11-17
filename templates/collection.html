@@ -4,9 +4,7 @@
     Full Collection
 {% endblock %}
 {% block main %}
-    <form id="form" class="form">
-
-        <table class="table table-bordered border-primary">
+        <table class="table table-bordered border-primary form">
             {% for album in albums %}
                 <tr border-bottom: 3px solid #000>
                     <td rowspan = "6">
@@ -70,5 +68,4 @@
 
             {% endfor %}
         </table>
-    </form>
 {% endblock %}
