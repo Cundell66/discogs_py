@@ -1,3 +1,9 @@
 cs50
 Flask
 requests
+os
+markdown
+codecs
+requests
+random
+math

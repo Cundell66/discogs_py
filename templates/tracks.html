@@ -4,7 +4,9 @@
     {{ title }}
 {% endblock %}
 {% block main %}
-    <table class="table table-bordered border-primary" style="width:50%">
+<form id="form" class="form">
+
+    <table class="table table-bordered border-primary" >
         <th colspan="2"> {{ artist }} - {{ title }} </th>
         <tr>
             <td>
@@ -23,4 +25,6 @@
             </td>
         </tr>
     </table>
+</form>
+
 {% endblock %}

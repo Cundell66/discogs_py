@@ -1,5 +1,6 @@
 import os
-
+import markdown
+import codecs
 from flask import Flask, render_template, request, redirect
 from cs50 import SQL
 import requests
@@ -73,6 +74,11 @@ def home():
     itemNo = itemNo % 49
     try:
         contents, tracklist, totalItems = fetchContents(itemNo, page)
+        # contents = db.execute("SELECT * FROM albums ORDER BY RANDOM() LIMIT 1").json()
+        print(contents)
+        # idNumber = contents["master_id"]
+        # master = requests.get(masterURL + str(idNumber) + "?token=" + discogsToken).json()
+        # tracklist = master["tracklist"]
         return render_template("index.html", contents=contents, tracklist=tracklist)
     except Exception as e:
         return render_template("index.html", contents=str(e))
@@ -139,10 +145,21 @@ def collection():
     albums = db.execute("SELECT * FROM albums ORDER BY artist, year")
     return render_template("collection.html", albums=albums)
 
+@app.route("/random_pick", methods=["GET"])
+def random_pick():
+    albums = db.execute("SELECT * FROM albums ORDER BY random() LIMIT 1")
+    return render_template("collection.html", albums=albums)
 
 @app.route("/database", methods=["GET"])
 def database():
     return render_template("database.html", result="")
+
+@app.route("/about", methods=["GET"])
+def about():
+    with codecs.open("README.md", "r", encoding="utf-8") as readme_file:
+        readme_content = readme_file.read()
+    content = markdown.markdown(readme_content)
+    return render_template("about.html", content=content)
 
 
 @app.route("/delete", methods=["POST"])
@@ -155,7 +172,7 @@ def delete():
 
 @app.route("/lyrics", methods=["POST"])
 def lyrics():
-    bad_chars = [";", ":", "-", "!", "*", ",", "'"]
+    bad_chars = [";", ":", "-", "!", "*", ",", "'","&"]
     artist = request.form.get("artist")
     title = request.form.get("title")
     print(artist, title)
@@ -172,20 +189,20 @@ def lyrics():
     headers = {
         "Authorization": f"Bearer {geniusToken}"
     }
-    print(headers)
     response = requests.get(search_url, headers=headers)
-    print(response)
     data = response.json()
+    print(data)
+    if data['response']['hits']!=[]:
+        api_path = data['response']['hits'][0]['result']['api_path']
+        song_url = f"https://api.genius.com{api_path}"
+        song_response = requests.get(song_url, headers=headers)
+        song_data = song_response.json()
+        content = song_data['response']['song']['embed_content']
+        return render_template("lyrics.html", content=content, artist=artist, title=title)
+    else:
+        content = f"Sorry, {title} by {artist} is not in the database"
+        return render_template("lyrics.html", content=content, artist=artist, title=title)
 
-    api_path = data['response']['hits'][0]['result']['api_path']
-
-    song_url = f"https://api.genius.com{api_path}"
-    song_response = requests.get(song_url, headers=headers)
-    song_data = song_response.json()
-
-    embed_content = song_data['response']['song']['embed_content']
-
-    return render_template("lyrics.html", content=embed_content, artist=artist, title=title)
 
 @app.route("/artist", methods=["POST"])
 def artist():
