@@ -156,7 +156,7 @@ def database():
 
 @app.route("/about", methods=["GET"])
 def about():
-    with codecs.open("README.md", "r", encoding="utf-8") as readme_file:
+    with codecs.open("readme.md", "r", encoding="utf-8") as readme_file:
         readme_content = readme_file.read()
     content = markdown.markdown(readme_content)
     return render_template("about.html", content=content)
