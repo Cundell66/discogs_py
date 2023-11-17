@@ -5,7 +5,8 @@
 {% endblock %}
 {% block main %}
     <h1> {{ artist }} Releases</h1>
-    <form action="https://www.wikipedia.com/wiki/{{artist}}_discography">
+    <form action="/wiki" method="post" >
+        <input name="artist" type="hidden" value="{{ artist }}">
         <input type="submit" value="Wiki Discography">
     </form>
     <div>

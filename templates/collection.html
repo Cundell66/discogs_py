@@ -12,7 +12,7 @@
                     <td rowspan = "6">
 
                         <div>
-                            <form action="https://www.wikipedia.com/wiki/{{album.artist}}_discography">
+                            <form action="/wiki" method="post" >
                                 <input name="artist" type="hidden" value="{{ album.artist }}">
                                 <input class="artist_button" type="submit" value="Wiki Discography">
                             </form>
