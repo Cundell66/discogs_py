@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Now Playing
+    {{contents["title"]}}
 {% endblock %}
 {% block main %}
     <form id="form" class="form" action="/tracks" method="post">
