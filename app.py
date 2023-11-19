@@ -198,6 +198,8 @@ def lyrics():
         song_response = requests.get(song_url, headers=headers)
         song_data = song_response.json()
         content = song_data['response']['song']['embed_content']
+        spotify = song_data['response']['song']['media']['url']
+        print(spotify)
         return render_template("lyrics.html", content=content, artist=artist, title=title)
     else:
         content = f"Sorry, {title} by {artist} is not in the database"
