@@ -4,8 +4,6 @@ import codecs
 from flask import Flask, render_template, request, redirect
 from cs50 import SQL
 import requests
-import random
-import math
 
 app = Flask(__name__)
 
@@ -23,23 +21,6 @@ totalItems = 355
 # set urls for required routes
 discogsURL = f"https://api.discogs.com/users/{userName}/collection/folders/{folderID}/releases?token={discogsToken}"
 masterURL = "https://api.discogs.com/masters/"
-
-
-# generate random number to select random title
-def getRandomNumber(max):
-    return math.floor(random.random() * max)
-
-
-# steps used in both post and get gathered together in function
-def fetchContents(itemNo, page):
-    discogs = requests.get(discogsURL + "&page=" + str(page)).json()
-    releases = discogs["releases"]
-    totalItems = discogs["pagination"]["items"]
-    contents = releases[itemNo]["basic_information"]
-    idNumber = contents["master_id"]
-    master = requests.get(masterURL + str(idNumber) + "?token=" + discogsToken).json()
-    tracklist = master["tracklist"]
-    return contents, tracklist, totalItems
 
 
 def fetchAllContents():
@@ -68,11 +49,8 @@ def fetchAllContents():
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    try:
-       albums = db.execute("SELECT * FROM albums ORDER BY random() LIMIT 1")
-       return render_template("collection.html", albums=albums)
-    except Exception as e:
-        return render_template("index.html", contents=str(e))
+    albums = db.execute("SELECT * FROM albums ORDER BY random() LIMIT 1")
+    return render_template("collection.html", albums=albums, title="random")
 
 
 @app.route("/update", methods=["GET"])
@@ -103,51 +81,28 @@ def update():
     except Exception as e:
         return str(e)
 
-
 @app.route("/rebuild", methods=["GET"])
 def rebuild():
     try:
         db.execute("DELETE FROM albums")
         db.execute("DELETE FROM sqlite_sequence WHERE name = 'albums'")
-
-        allcontents = fetchAllContents()
-        for i in range(len(allcontents)):
-            contents = allcontents[i]
-            db.execute(
-                "INSERT INTO albums (artist, artist_id, title, year, description, cover_image, genres, label, release_id, master_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                contents["artists"][0]["name"],
-                contents["artists"][0]["id"],
-                contents["title"],
-                contents["year"],
-                ",".join(contents["formats"][0]["descriptions"]),
-                contents["cover_image"],
-                contents["genres"][0],
-                contents["labels"][0]["name"],
-                contents["id"],
-                contents["master_id"],
-            )
-        return redirect("/collection")
+        return update()
     except Exception as e:
         return str(e)
-
 
 @app.route("/collection", methods=["GET"])
 def collection():
     albums = db.execute("SELECT * FROM albums ORDER BY artist, year")
-    return render_template("collection.html", albums=albums)
+    return render_template("collection.html", albums=albums, title = "Full Collection")
 
 @app.route("/random_pick", methods=["GET"])
 def random_pick():
     albums = db.execute("SELECT * FROM albums ORDER BY random() LIMIT 1")
-    return render_template("collection.html", albums=albums)
-
-@app.route("/database", methods=["GET"])
-def database():
-    return render_template("database.html", result="")
+    return render_template("collection.html", albums=albums, title = "")
 
 @app.route("/about", methods=["GET"])
 def about():
-    with codecs.open("readme.md", "r", encoding="utf-8") as readme_file:
+    with codecs.open("README.md", "r", encoding="utf-8") as readme_file:
         readme_content = readme_file.read()
     content = markdown.markdown(readme_content)
     return render_template("about.html", content=content)
@@ -175,9 +130,7 @@ def lyrics():
         if i not in bad_chars:
             t += i
     search_url = f"https://api.genius.com/search?q={a.replace(' ','-')}-{t.replace(' ','-')}"
-    headers = {
-        "Authorization": f"Bearer {geniusToken}"
-    }
+    headers = {"Authorization": f"Bearer {geniusToken}" }
     response = requests.get(search_url, headers=headers)
     data = response.json()
     if data['response']['hits']!=[]:
@@ -230,7 +183,7 @@ def search():
         albums = db.execute("SELECT * FROM albums WHERE artist LIKE ? ORDER BY year", "%" + q + "%")
     else:
         albums = []
-    return render_template("search.html", albums=albums, q=q)
+    return render_template("collection.html", albums=albums, title = f"search for {q}")
 
 @app.route("/wiki", methods=["POST"])
 def wiki():
