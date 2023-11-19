@@ -166,7 +166,6 @@ def lyrics():
     bad_chars = [";", ":", "-", "!", "*", ",", "'","&"]
     artist = request.form.get("artist")
     title = request.form.get("title")
-    print(artist, title)
     a = ""
     for i in artist:
         if i not in bad_chars:
@@ -176,13 +175,11 @@ def lyrics():
         if i not in bad_chars:
             t += i
     search_url = f"https://api.genius.com/search?q={a.replace(' ','-')}-{t.replace(' ','-')}"
-    print(search_url)
     headers = {
         "Authorization": f"Bearer {geniusToken}"
     }
     response = requests.get(search_url, headers=headers)
     data = response.json()
-    print(data)
     if data['response']['hits']!=[]:
         api_path = data['response']['hits'][0]['result']['api_path']
         song_url = f"https://api.genius.com{api_path}"
