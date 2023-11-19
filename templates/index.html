@@ -1,45 +1,8 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    {{contents["title"]}}
+    {{contents}}
 {% endblock %}
 {% block main %}
-    <form id="form" class="form" action="/tracks" method="post">
-        <table class="table table-bordered border-primary">
-            <thead>
-                <th> {{contents.artists[0].name}} </th>
-                <th> {{contents["title"]}} </th>
-            </thead>
-            <tr>
-                <td> <img class="image" src={{ contents["cover_image"] }} /> </td>
-                <td class="tracks">
-                    {% for tracks in tracklist %}
-                        <div>
-                            <input name="artist" type="hidden" value="{{ contents.artists[0].name }}">
-                            <input name="title" type="hidden" value="{{ contents["title"] }}">
-                            <input name="cover" type="hidden" value="{{ contents["cover_image"] }}">
-                            <input name="master_id" type="hidden" value="{{ contents["master_id"] }}">
-                            <button class="artist_button" type="submit">{{ tracks["position"]}} {{tracks["title"]}} {{tracks["duration"]}}</button>
-                        </div>
-                    {% endfor %}
-                </td>
-            </tr>
-            <tr>
-                <td> {{contents.year}} </td>
-                <td>
-                    {% for description in contents.formats[0].descriptions %}
-                        {{ description }},
-                    {% endfor %}
-                </td>
-            </tr>
-            <tr>
-                <td>{{contents.labels[0].name}} </td>
-                <td>
-                    {% for genre in contents.genres %}
-                        {{genre}},
-                    {% endfor %}
-                </td>
-            </tr>
-        </table>
-    </form>
+    <p>contents</p>
 {% endblock %}

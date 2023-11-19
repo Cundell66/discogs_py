@@ -4,9 +4,7 @@
     search for {{q}}
 {% endblock %}
 {% block main %}
-    <form id="form" class="form">
-
-        <table class="table table-bordered border-primary">
+        <table class="table table-bordered border-primary form">
             <th colspan = "4">Search for {{q}}</th>
             {% for album in albums %}
                 <tr border-bottom: 3px solid #000>
@@ -70,6 +68,5 @@
 
             {% endfor %}
         </table>
-    </form>
     
 {% endblock %}

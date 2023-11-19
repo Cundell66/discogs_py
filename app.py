@@ -68,18 +68,9 @@ def fetchAllContents():
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    global totalItems
-    itemNo = getRandomNumber(totalItems)
-    page = math.floor(itemNo / 49) + 1
-    itemNo = itemNo % 49
     try:
-        contents, tracklist, totalItems = fetchContents(itemNo, page)
-        # contents = db.execute("SELECT * FROM albums ORDER BY RANDOM() LIMIT 1").json()
-        print(contents)
-        # idNumber = contents["master_id"]
-        # master = requests.get(masterURL + str(idNumber) + "?token=" + discogsToken).json()
-        # tracklist = master["tracklist"]
-        return render_template("index.html", contents=contents, tracklist=tracklist)
+       albums = db.execute("SELECT * FROM albums ORDER BY random() LIMIT 1")
+       return render_template("collection.html", albums=albums)
     except Exception as e:
         return render_template("index.html", contents=str(e))
 
